@@ -1,0 +1,1 @@
+package/react-native.config.js
