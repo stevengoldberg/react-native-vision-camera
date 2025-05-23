@@ -222,6 +222,8 @@ enum CaptureError {
   case insufficientStorage
   case failedWritingMetadata(cause: Error?)
   case unknown(message: String? = nil)
+  case proRawNotSupported
+  case hdrGainMapNotSupported
 
   var code: String {
     switch self {
@@ -259,6 +261,10 @@ enum CaptureError {
       return "failed-writing-metadata"
     case .unknown:
       return "unknown"
+    case .proRawNotSupported:
+      return "pro-raw-not-supported"
+    case .hdrGainMapNotSupported:
+      return "hdr-gain-map-not-supported"
     }
   }
 
@@ -298,6 +304,10 @@ enum CaptureError {
       return "There is not enough storage space available."
     case let .unknown(message: message):
       return message ?? "An unknown error occured while capturing a video/photo."
+    case .proRawNotSupported:
+      return "ProRaw capture is not supported on this device."
+    case .hdrGainMapNotSupported:
+      return "HDR Gain Map capture is not supported on this device."
     }
   }
 }

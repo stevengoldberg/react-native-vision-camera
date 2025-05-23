@@ -38,6 +38,20 @@ export interface TakePhotoOptions {
    * @default true
    */
   enableShutterSound?: boolean
+  /**
+   * Whether to enable ProRaw capture.
+   *
+   * @platform iOS
+   * @default false
+   */
+  enableProRaw?: boolean
+  /**
+   * Whether to enable HDR Gain Map capture.
+   *
+   * @platform iOS
+   * @default false
+   */
+  enableHDRGainMap?: boolean
 }
 
 /**

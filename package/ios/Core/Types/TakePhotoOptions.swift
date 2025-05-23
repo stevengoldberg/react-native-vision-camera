@@ -14,8 +14,18 @@ struct TakePhotoOptions {
   var enableAutoRedEyeReduction = false
   var enableAutoDistortionCorrection = false
   var enableShutterSound = true
+  var enableProRaw = false
+  var enableHDRGainMap = false
 
   init(fromJSValue dictionary: NSDictionary) throws {
+    // ProRaw
+    if let enable = dictionary["enableProRaw"] as? Bool {
+      enableProRaw = enable
+    }
+    // HDR Gain Map
+    if let enable = dictionary["enableHDRGainMap"] as? Bool {
+      enableHDRGainMap = enable
+    }
     // Flash
     if let flashOption = dictionary["flash"] as? String {
       flash = try Flash(jsValue: flashOption)
@@ -33,10 +43,11 @@ struct TakePhotoOptions {
       enableShutterSound = enable
     }
     // Custom Path
+    let fileExtension = enableProRaw ? "dng" : "jpg"
     if let customPath = dictionary["path"] as? String {
-      path = try FileUtils.getFilePath(customDirectory: customPath, fileExtension: "jpg")
+      path = try FileUtils.getFilePath(customDirectory: customPath, fileExtension: fileExtension)
     } else {
-      path = try FileUtils.getFilePath(fileExtension: "jpg")
+      path = try FileUtils.getFilePath(fileExtension: fileExtension)
     }
   }
 }

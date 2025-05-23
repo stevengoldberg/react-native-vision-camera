@@ -16,17 +16,25 @@ class PhotoCaptureDelegate: GlobalReferenceHolder, AVCapturePhotoCaptureDelegate
   private let cameraSessionDelegate: CameraSessionDelegate?
   private let metadataProvider: MetadataProvider
   private let path: URL
+  private let isProRaw: Bool
+  private let enableHDRGainMap: Bool
 
   required init(promise: Promise,
                 enableShutterSound: Bool,
                 metadataProvider: MetadataProvider,
                 path: URL,
+                isProRaw: Bool = false,
+                enableHDRGainMap: Bool = false,
                 cameraSessionDelegate: CameraSessionDelegate?) {
     self.promise = promise
     self.enableShutterSound = enableShutterSound
     self.metadataProvider = metadataProvider
     self.path = path
+    self.isProRaw = isProRaw
+    self.enableHDRGainMap = enableHDRGainMap
     self.cameraSessionDelegate = cameraSessionDelegate
+    self.isProRaw = isProRaw
+    self.enableHDRGainMap = enableHDRGainMap
     super.init()
     makeGlobal()
   }
@@ -51,9 +59,27 @@ class PhotoCaptureDelegate: GlobalReferenceHolder, AVCapturePhotoCaptureDelegate
     }
 
     do {
-      try FileUtils.writePhotoToFile(photo: photo,
-                                     metadataProvider: metadataProvider,
-                                     file: path)
+      if isProRAW {
+        // Handle ProRAW (DNG) data
+        guard let dngData = photo.fileDataRepresentation() else {
+          promise.reject(error: .capture(.imageDataAccessError))
+          return
+        }
+        try dngData.write(to: path)
+      } else {
+        // Handle regular JPEG/HEIF
+        try FileUtils.writePhotoToFile(photo: photo,
+                                       metadataProvider: metadataProvider,
+                                       file: path)
+        
+        // Extract HDR gain map if enabled and available
+        if enableHDRGainMap, #available(iOS 14.1, *) {
+          if let gainMapData = photo.auxiliaryDataInfo?[.auxiliaryHDRGainMap] as? Data {
+            let gainMapPath = path.appendingPathExtension("gainmap")
+            try gainMapData.write(to: gainMapPath)
+          }
+        }
+      }
 
       let exif = photo.metadata["{Exif}"] as? [String: Any]
       let width = exif?["PixelXDimension"]

@@ -36,6 +36,28 @@ extension CameraSession {
         return
       }
 
+            // Check ProRAW support
+      if options.enableProRAW {
+        guard #available(iOS 14.3, *) else {
+          promise.reject(error: .capture(.proRAWNotSupported))
+          return
+        }
+        
+        let device = videoDeviceInput.device
+        guard device.activeFormat.supportedRawPhotoPixelFormatTypes.contains(kCVPixelFormatType_14Bayer_RGGB) else {
+          promise.reject(error: .capture(.proRAWNotSupported))
+          return
+        }
+      }
+      
+      // Check HDR gain map support
+      if options.enableHDRGainMap {
+        guard #available(iOS 14.1, *) else {
+          promise.reject(error: .capture(.hdrGainMapNotSupported))
+          return
+        }
+      }
+
       VisionLogger.log(level: .info, message: "Capturing photo...")
 
       // Create photo settings
@@ -84,7 +106,9 @@ extension CameraSession {
                                                       enableShutterSound: options.enableShutterSound,
                                                       metadataProvider: self.metadataProvider,
                                                       path: options.path,
-                                                      cameraSessionDelegate: self.delegate)
+                                                      cameraSessionDelegate: self.delegate,
+                                                      isProRaw: options.enableProRaw,
+                                                      enableHDRGainMap: options.enableHDRGainMap)
       photoOutput.capturePhoto(with: photoSettings, delegate: photoCaptureDelegate)
 
       // Assume that `takePhoto` is always called with the same parameters, so prepare the next call too.
