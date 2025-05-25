@@ -107,7 +107,7 @@ class PhotoCaptureDelegate: GlobalReferenceHolder, AVCapturePhotoCaptureDelegate
           // Handle processed (JPEG/HEIF) photo
           processedPhotoPath = generatePhotoPath(originalPath: path, isRaw: false)
           
-          autoreleasepool {
+          try autoreleasepool {
             try FileUtils.writePhotoToFile(photo: photo,
                                            metadataProvider: metadataProvider,
                                            file: processedPhotoPath!)
