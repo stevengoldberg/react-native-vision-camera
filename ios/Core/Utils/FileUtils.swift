@@ -47,6 +47,21 @@ enum FileUtils {
   static var tempDirectory: URL {
     return FileManager.default.temporaryDirectory
   }
+  
+  static var documentsDirectory: URL {
+    return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+  }
+  
+  static var cameraDirectory: URL {
+    let cameraDir = documentsDirectory.appendingPathComponent("VisionCamera", isDirectory: true)
+    
+    // Create directory if it doesn't exist
+    if !FileManager.default.fileExists(atPath: cameraDir.path) {
+      try? FileManager.default.createDirectory(at: cameraDir, withIntermediateDirectories: true, attributes: nil)
+    }
+    
+    return cameraDir
+  }
 
   static func createRandomFileName(withExtension fileExtension: String) -> String {
     return UUID().uuidString + "." + fileExtension

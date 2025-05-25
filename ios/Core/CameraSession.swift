@@ -50,16 +50,16 @@ final class CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
    */
   var isProRawSupported: Bool {
     guard #available(iOS 14.3, *) else { return false }
-    return photoOutput?.isAppleProRAWSupported ?? false
-  }
+      return photoOutput?.isAppleProRAWSupported ?? false
+    }
 
   /**
    * Whether Apple ProRaw is currently enabled on the photo output
    */
   var isProRawEnabled: Bool {
     guard #available(iOS 14.3, *) else { return false }
-    return photoOutput?.isAppleProRAWEnabled ?? false
-  }
+      return photoOutput?.isAppleProRAWEnabled ?? false
+    }
 
   /**
    * Available raw photo pixel format types.

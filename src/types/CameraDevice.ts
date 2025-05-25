@@ -206,11 +206,6 @@ export interface CameraDevice {
    */
   supportsLowLightBoost: boolean
   /**
-   * Whether this camera device supports Apple ProRAW capture.
-   * Determined once at startup based on device capabilities.
-   */
-  supportsProRaw: boolean
-  /**
    * Specifies whether this device supports focusing ({@linkcode Camera.focus | Camera.focus(...)})
    */
   supportsFocus: boolean

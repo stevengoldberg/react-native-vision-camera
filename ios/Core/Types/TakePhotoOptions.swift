@@ -52,7 +52,13 @@ struct TakePhotoOptions {
     if let customPath = dictionary["path"] as? String {
       path = try FileUtils.getFilePath(customDirectory: customPath, fileExtension: fileExtension)
     } else {
-      path = try FileUtils.getFilePath(fileExtension: fileExtension)
+      // For ProRAW, save to temp directory and let JavaScript handle Photos library integration
+      // For regular photos, save to camera directory as usual
+      if enableProRaw {
+        path = try FileUtils.getFilePath(directory: FileUtils.tempDirectory, fileExtension: fileExtension)
+      } else {
+        path = try FileUtils.getFilePath(fileExtension: fileExtension)
+      }
     }
   }
 }

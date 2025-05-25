@@ -10,20 +10,14 @@ import AVFoundation
 
 extension AVCaptureDevice {
   func toDictionary() -> [String: Any] {
-    VisionLogger.log(level: .info, message: "Checking ProRAW capability for device: \(self.localizedName) (\(self.position.descriptor))")
-    
-    // Device-level ProRAW support will be determined when the camera session is actually configured
-    // to avoid expensive session creation during device enumeration. 
-    // Use getCameraSessionInfo() after camera initialization to get the real capability.
-    let deviceSupportsProRaw = false
+    // ProRAW capability is determined dynamically when the camera session is configured
+    // and communicated via the onProRawCapabilityChanged event
     
     // Return ALL formats without ProRAW marking - ProRAW support is now device-level only
     let deviceFormats = self.formats.map { deviceFormat in
       return CameraDeviceFormat(fromFormat: deviceFormat)
     }
     
-    VisionLogger.log(level: .info, message: "Device supports ProRAW: \(deviceSupportsProRaw), returning \(deviceFormats.count) formats")
-
     return [
       "id": uniqueID,
       "physicalDevices": physicalDevices.map(\.deviceType.physicalDeviceDescriptor),
@@ -38,7 +32,6 @@ extension AVCaptureDevice {
       "minExposure": minExposureTargetBias,
       "maxExposure": maxExposureTargetBias,
       "isMultiCam": isMultiCam,
-      "supportsProRaw": deviceSupportsProRaw,
       "supportsLowLightBoost": isLowLightBoostSupported,
       "supportsFocus": isFocusPointOfInterestSupported,
       "hardwareLevel": HardwareLevel.full.jsValue,

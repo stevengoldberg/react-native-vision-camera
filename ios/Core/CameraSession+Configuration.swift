@@ -324,18 +324,13 @@ extension CameraSession {
       // This is the accurate check following Apple's documentation
       delegate?.onProRawCapabilityDetermined(isSupported: photoOutput.isAppleProRAWSupported)
       
-      if photo.enableProRaw {
-        if photoOutput.isAppleProRAWSupported {
-          photoOutput.isAppleProRAWEnabled           = true
-          photoOutput.isHighResolutionCaptureEnabled = true // mandatory for RAW/ProRAW
-          VisionLogger.log(level: .info, message: "✅ ProRAW enabled on photo output")
-          
-        } else {
-          VisionLogger.log(level: .warning, message: "❌ ProRAW requested but output.isAppleProRAWSupported = false")
-          VisionLogger.log(level: .warning, message: "This usually means the current format doesn't support ProRAW.")
-        }
+      // Always enable ProRAW if supported, so it's available for takePhoto calls
+      if photoOutput.isAppleProRAWSupported {
+        photoOutput.isAppleProRAWEnabled           = true
+        photoOutput.isHighResolutionCaptureEnabled = true // mandatory for RAW/ProRAW
+        VisionLogger.log(level: .info, message: "✅ ProRAW enabled on photo output (always enabled when supported)")
       } else {
-        VisionLogger.log(level: .info, message: "ProRAW not requested (enableProRaw = false)")
+        VisionLogger.log(level: .info, message: "ProRAW not supported by current configuration")
       }
     } else {
       VisionLogger.log(level: .info, message: "iOS < 14.3, ProRAW not available")

@@ -67,7 +67,6 @@ extension CameraSession {
 
               if !photoOutput.isAppleProRAWEnabled {
                 photoOutput.isAppleProRAWEnabled = true
-                VisionLogger.log(level: .info, message: "ProRAW enabled on photo output")
               }
                 // Follow Apple's documentation: choose appropriate RAW format
                 // Prefer Apple ProRAW when enabled, fall back to Bayer RAW when not
@@ -81,13 +80,20 @@ extension CameraSession {
                     return
                 }
                 
-                // Always do dual capture for ProRAW to get full-size JPEG embedded in DNG
-                // This is how Camera app creates full-quality previews
-                let processedFormat = [AVVideoCodecKey: AVVideoCodecType.hevc]
-                photoSettings = AVCapturePhotoSettings(rawPixelFormatType: rawFormat, processedFormat: processedFormat)
-                VisionLogger.log(level: .info, message: "Capturing ProRAW with embedded full-size HEVC")
+                // Use ProRAW with embedded JPEG thumbnail following Apple's WWDC21 documentation
+                photoSettings = AVCapturePhotoSettings(rawPixelFormatType: rawFormat)
                 
-                VisionLogger.log(level: .info, message: "Using RAW pixel format: \(rawFormat) (ProRAW enabled: \(photoOutput.isAppleProRAWEnabled))")
+                // Add embedded JPEG thumbnail to the ProRAW file
+                if let thumbnailCodecType = photoSettings.availableRawEmbeddedThumbnailPhotoCodecTypes.first {
+                    let formatDimensions = videoDeviceInput.device.activeFormat.photoDimensions
+                    
+                    // Use full resolution for embedded thumbnail to get best quality
+                    photoSettings.rawEmbeddedThumbnailPhotoFormat = [
+                        AVVideoCodecKey: thumbnailCodecType,
+                        AVVideoWidthKey: formatDimensions.width,
+                        AVVideoHeightKey: formatDimensions.height
+                    ]
+                }
             } else {
                 // Regular photo settings
                 photoSettings = AVCapturePhotoSettings()
@@ -98,27 +104,15 @@ extension CameraSession {
                 let formatDimensions = videoDeviceInput.device.activeFormat.photoDimensions
                 
                 if options.enableProRaw {
-                    // For ProRAW dual capture, we might want different resolutions
-                    // RAW should be full resolution, but processed can be smaller for preview
-                    // Use 12MP (4032×3024) for processed preview - good quality but not huge file size
-                    let previewDimensions = CMVideoDimensions(width: 4032, height: 3024)
-                    
-                    // If format is already 12MP or smaller, use format dimensions
-                    // If format is larger, use 12MP for better file size
-                    let usePreviewDimensions = formatDimensions.width > previewDimensions.width
-                    let targetDimensions = usePreviewDimensions ? previewDimensions : formatDimensions
-                    
-                    photoSettings.maxPhotoDimensions = targetDimensions
-                    VisionLogger.log(level: .info, message: "Set ProRAW dual capture dimensions to: \(targetDimensions.width)x\(targetDimensions.height) (format: \(formatDimensions.width)x\(formatDimensions.height))")
+                    // For ProRAW with embedded thumbnail, use full resolution
+                    // The embedded thumbnail provides the processed version within the DNG file
+                    photoSettings.maxPhotoDimensions = formatDimensions
                 } else {
                     // For regular photos, use format's native dimensions
                     photoSettings.maxPhotoDimensions = formatDimensions
-                    VisionLogger.log(level: .info, message: "Set photo dimensions to format native: \(formatDimensions.width)x\(formatDimensions.height)")
                 }
-                VisionLogger.log(level: .info, message: "Photo output maxPhotoDimensions: \(photoOutput.maxPhotoDimensions.width)x\(photoOutput.maxPhotoDimensions.height)")
             } else {
                 photoSettings.isHighResolutionPhotoEnabled = photoOutput.isHighResolutionCaptureEnabled
-                VisionLogger.log(level: .info, message: "High resolution photo enabled: \(photoOutput.isHighResolutionCaptureEnabled)")
             }
             
             // depth data
@@ -162,8 +156,11 @@ extension CameraSession {
                                                             cameraSessionDelegate: self.delegate)
             photoOutput.capturePhoto(with: photoSettings, delegate: photoCaptureDelegate)
             
-            // Assume that `takePhoto` is always called with the same parameters, so prepare the next call too.
-            photoOutput.setPreparedPhotoSettingsArray([photoSettings], completionHandler: nil)
+            // Don't prepare settings for ProRAW captures as they can be resource-intensive
+            // and may cause system-wide resource leaks. Only prepare for regular photos.
+            if !options.enableProRaw {
+                photoOutput.setPreparedPhotoSettingsArray([photoSettings], completionHandler: nil)
+            }
         }
     }
 }

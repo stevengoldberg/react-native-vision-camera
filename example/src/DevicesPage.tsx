@@ -41,8 +41,7 @@ function Device({ device, onPress }: DeviceProps): React.ReactElement {
   )
   const deviceTypes = useMemo(() => device.physicalDevices.map((t) => t.replace('-camera', '')).join(' + '), [device.physicalDevices])
   
-  // Check ProRaw support at device level
-  const hasProRawSupport = device.supportsProRaw
+  // ProRaw support is determined dynamically via onProRawCapabilityChanged event
 
   return (
     <PressableOpacity style={styles.itemContainer} onPress={onPress}>
@@ -56,9 +55,9 @@ function Device({ device, onPress }: DeviceProps): React.ReactElement {
       
       {/* ProRaw support info */}
       <View style={styles.horizontal}>
-        <IonIcon name="image" size={12} color={hasProRawSupport ? "green" : "gray"} />
-        <Text style={[styles.resolutionText, { color: hasProRawSupport ? "green" : "gray" }]}>
-          ProRaw: {hasProRawSupport ? 'Supported' : 'Not supported'}
+                  <IonIcon name="image" size={12} color="gray" />
+        <Text style={styles.resolutionText}>
+          ProRaw: Use onProRawCapabilityChanged event
         </Text>
       </View>
       
