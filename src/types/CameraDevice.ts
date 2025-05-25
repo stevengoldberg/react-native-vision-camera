@@ -206,11 +206,10 @@ export interface CameraDevice {
    */
   supportsLowLightBoost: boolean
   /**
-   * Whether this camera supports taking photos in RAW format
-   *
-   * **! Work in Progress !**
+   * Whether this camera device supports Apple ProRAW capture.
+   * Determined once at startup based on device capabilities.
    */
-  supportsRawCapture: boolean
+  supportsProRaw: boolean
   /**
    * Specifies whether this device supports focusing ({@linkcode Camera.focus | Camera.focus(...)})
    */
@@ -234,4 +233,36 @@ export interface CameraDevice {
    * @see See ["Orientation"](https://react-native-vision-camera.com/docs/guides/orientation)
    */
   sensorOrientation: Orientation
+}
+
+/**
+ * Information about the current camera session configuration,
+ * including available raw pixel format types.
+ */
+export interface CameraSessionInfo {
+  /**
+   * Whether the current camera session supports Apple ProRaw capture
+   */
+  isProRawSupported: boolean
+  /**
+   * Whether Apple ProRaw is currently enabled on the photo output
+   */
+  isProRawEnabled: boolean
+  /**
+   * Available raw photo pixel format types.
+   * This array is populated when ProRaw is enabled.
+   *
+   * Note: This includes both traditional RAW formats (Bayer) and Apple ProRaw formats.
+   */
+  availableRawPhotoPixelFormatTypes: number[]
+  /**
+   * Available Apple ProRaw pixel format types (subset of availableRawPhotoPixelFormatTypes).
+   * These are the formats you can use with enableProRaw: true in takePhoto options.
+   */
+  availableProRawPixelFormatTypes: number[]
+  /**
+   * Available traditional (Bayer) RAW pixel format types (subset of availableRawPhotoPixelFormatTypes).
+   * These are traditional RAW formats, not Apple ProRaw.
+   */
+  availableBayerRAWPixelFormatTypes: number[]
 }

@@ -29,6 +29,8 @@ public final class CameraView: UIView, CameraSessionDelegate, PreviewViewDelegat
   @objc var enablePortraitEffectsMatteDelivery = false
   @objc var enableBufferCompression = false
   @objc var isMirrored = false
+  @objc var enableProRaw = false
+  @objc var enableHDRGainMap = false
 
   // use cases
   @objc var photo = false
@@ -201,7 +203,9 @@ public final class CameraView: UIView, CameraSessionDelegate, PreviewViewDelegat
       if photo {
         config.photo = .enabled(config: CameraConfiguration.Photo(qualityBalance: getPhotoQualityBalance(),
                                                                   enableDepthData: enableDepthData,
-                                                                  enablePortraitEffectsMatte: enablePortraitEffectsMatteDelivery))
+                                                                  enablePortraitEffectsMatte: enablePortraitEffectsMatteDelivery,
+                                                                  enableProRaw: enableProRaw,
+                                                                  enableHDRGainMap: enableHDRGainMap))
       } else {
         config.photo = .disabled
       }

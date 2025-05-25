@@ -30,6 +30,8 @@ RCT_EXPORT_VIEW_PROPERTY(enableDepthData, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(enablePortraitEffectsMatteDelivery, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(enableBufferCompression, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(isMirrored, BOOL);
+RCT_EXPORT_VIEW_PROPERTY(enableProRaw, BOOL);
+RCT_EXPORT_VIEW_PROPERTY(enableHDRGainMap, BOOL);
 // use cases
 RCT_EXPORT_VIEW_PROPERTY(preview, BOOL);
 RCT_EXPORT_VIEW_PROPERTY(photo, BOOL);
@@ -87,6 +89,8 @@ RCT_EXTERN_METHOD(takePhoto : (nonnull NSNumber*)node options : (NSDictionary*)o
 RCT_EXTERN_METHOD(takeSnapshot : (nonnull NSNumber*)node options : (NSDictionary*)options resolve : (RCTPromiseResolveBlock)
                       resolve reject : (RCTPromiseRejectBlock)reject);
 RCT_EXTERN_METHOD(focus : (nonnull NSNumber*)node point : (NSDictionary*)point resolve : (RCTPromiseResolveBlock)
+                      resolve reject : (RCTPromiseRejectBlock)reject);
+RCT_EXTERN_METHOD(getCameraSessionInfo : (nonnull NSNumber*)node resolve : (RCTPromiseResolveBlock)
                       resolve reject : (RCTPromiseRejectBlock)reject);
 
 @end

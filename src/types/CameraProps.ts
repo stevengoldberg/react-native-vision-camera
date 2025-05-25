@@ -292,6 +292,26 @@ export interface CameraProps extends ViewProps {
    * @default false
    */
   enablePortraitEffectsMatteDelivery?: boolean
+    /**
+   * Enables or disables ProRaw capture capability on the photo output.
+   *
+   * When enabled, the camera will be configured to support ProRaw capture,
+   * and you can use `enableProRaw: true` in `takePhoto()` options to capture ProRaw images.
+   *
+   * @platform iOS 14.3+
+   * @default false
+   */
+    enableProRaw?: boolean
+    /**
+     * Enables or disables HDR Gain Map capture capability on the photo output.
+     *
+     * When enabled, you can use `enableHDRGainMap: true` in `takePhoto()` options
+     * to capture images with HDR gain map data.
+     *
+     * @platform iOS 14.1+
+     * @default false
+     */
+    enableHDRGainMap?: boolean
   /**
    * If `true`, show a debug view to display the FPS of the Video Pipeline (Frame Processor).
    * This is useful for debugging your Frame Processor's speed.

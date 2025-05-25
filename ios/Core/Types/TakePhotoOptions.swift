@@ -15,12 +15,17 @@ struct TakePhotoOptions {
   var enableAutoDistortionCorrection = false
   var enableShutterSound = true
   var enableProRaw = false
+  var enableRawWithProcessed = false
   var enableHDRGainMap = false
 
   init(fromJSValue dictionary: NSDictionary) throws {
     // ProRaw
     if let enable = dictionary["enableProRaw"] as? Bool {
       enableProRaw = enable
+    }
+    // Raw with processed
+    if let enable = dictionary["enableRawWithProcessed"] as? Bool {
+      enableRawWithProcessed = enable
     }
     // HDR Gain Map
     if let enable = dictionary["enableHDRGainMap"] as? Bool {

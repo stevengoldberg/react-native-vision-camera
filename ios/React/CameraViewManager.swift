@@ -146,6 +146,22 @@ final class CameraViewManager: RCTViewManager {
     #endif
   }
 
+  @objc
+  final func getCameraSessionInfo(_ node: NSNumber, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) {
+    let component = getCameraView(withTag: node)
+    let session = component.cameraSession
+    
+    var sessionInfo: [String: Any] = [
+      "isProRawSupported": session.isProRawSupported,
+      "isProRawEnabled": session.isProRawEnabled,
+      "availableRawPhotoPixelFormatTypes": session.availableRawPhotoPixelFormatTypes,
+      "availableProRawPixelFormatTypes": session.availableProRawPixelFormatTypes,
+      "availableBayerRAWPixelFormatTypes": session.availableBayerRAWPixelFormatTypes
+    ]
+    
+    resolve(sessionInfo)
+  }
+
   // MARK: Private
 
   func getCameraView(withTag tag: NSNumber) -> CameraView {

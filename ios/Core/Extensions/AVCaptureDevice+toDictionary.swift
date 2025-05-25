@@ -10,7 +10,20 @@ import AVFoundation
 
 extension AVCaptureDevice {
   func toDictionary() -> [String: Any] {
-    let formats = formats.map { CameraDeviceFormat(fromFormat: $0) }
+    VisionLogger.log(level: .info, message: "Checking ProRAW capability for device: \(self.localizedName) (\(self.position.descriptor))")
+    
+    // Determine device-level ProRAW support
+    var deviceSupportsProRaw = false
+    if #available(iOS 14.3, *) {
+      deviceSupportsProRaw = AVCapturePhotoOutput().isAppleProRAWSupported
+    }
+    
+    // Return ALL formats without ProRAW marking - ProRAW support is now device-level only
+    let deviceFormats = self.formats.map { deviceFormat in
+      return CameraDeviceFormat(fromFormat: deviceFormat)
+    }
+    
+    VisionLogger.log(level: .info, message: "Device supports ProRAW: \(deviceSupportsProRaw), returning \(deviceFormats.count) formats")
 
     return [
       "id": uniqueID,
@@ -26,12 +39,12 @@ extension AVCaptureDevice {
       "minExposure": minExposureTargetBias,
       "maxExposure": maxExposureTargetBias,
       "isMultiCam": isMultiCam,
-      "supportsRawCapture": false, // TODO: supportsRawCapture
+      "supportsProRaw": deviceSupportsProRaw,
       "supportsLowLightBoost": isLowLightBoostSupported,
       "supportsFocus": isFocusPointOfInterestSupported,
       "hardwareLevel": HardwareLevel.full.jsValue,
       "sensorOrientation": sensorOrientation.jsValue,
-      "formats": formats.map { $0.toJSValue() },
+      "formats": deviceFormats.map { $0.toJSValue() },
     ]
   }
 }

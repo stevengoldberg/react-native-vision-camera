@@ -172,6 +172,8 @@ final class CameraConfiguration {
     var qualityBalance: QualityBalance = .balanced
     var enableDepthData = false
     var enablePortraitEffectsMatte = false
+    var enableProRaw = false
+    var enableHDRGainMap = false
   }
 
   /**

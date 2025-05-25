@@ -26,7 +26,7 @@ export interface TakePhotoOptions {
   enableAutoRedEyeReduction?: boolean
   /**
    * Specifies whether the photo output should use content aware distortion correction on this photo request.
-   * For example, the algorithm may not apply correction to faces in the center of a photo, but may apply it to faces near the photo’s edges.
+   * For example, the algorithm may not apply correction to faces in the center of a photo, but may apply it to faces near the photo's edges.
    *
    * @platform iOS
    * @default false
@@ -45,6 +45,15 @@ export interface TakePhotoOptions {
    * @default false
    */
   enableProRaw?: boolean
+  /**
+   * Whether to also capture a processed (HEVC/JPEG) version alongside the RAW photo.
+   * Only works when enableProRaw is true.
+   * This creates two separate files: one RAW and one processed.
+   *
+   * @platform iOS
+   * @default false
+   */
+  enableRawWithProcessed?: boolean
   /**
    * Whether to enable HDR Gain Map capture.
    *
@@ -83,6 +92,18 @@ export interface PhotoFile extends TemporaryFile {
    */
   isMirrored: boolean
   thumbnail?: Record<string, unknown>
+  /**
+   * When dual capture (RAW + processed) is enabled, this contains the path to the RAW (.dng) file.
+   * 
+   * @platform iOS
+   */
+  rawPath?: string
+  /**
+   * When dual capture (RAW + processed) is enabled, this contains the path to the processed (.hevc/.jpg) file.
+   * 
+   * @platform iOS
+   */
+  processedPath?: string
   /**
    * Metadata information describing the captured image. (iOS only)
    *

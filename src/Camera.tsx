@@ -1,6 +1,6 @@
 import React from 'react'
 import { findNodeHandle, StyleSheet } from 'react-native'
-import type { CameraDevice } from './types/CameraDevice'
+import type { CameraDevice, CameraSessionInfo } from './types/CameraDevice'
 import type { CameraCaptureError } from './CameraError'
 import { CameraRuntimeError, tryParseNativeCameraError, isErrorWithCause } from './CameraError'
 import type { CameraProps, DrawableFrameProcessor, OnShutterEvent, ReadonlyFrameProcessor } from './types/CameraProps'
@@ -376,6 +376,27 @@ export class Camera extends React.PureComponent<CameraProps, CameraState> {
   public async focus(point: Point): Promise<void> {
     try {
       return await CameraModule.focus(this.handle, point)
+    } catch (e) {
+      throw tryParseNativeCameraError(e)
+    }
+  }
+
+  /**
+   * Get information about the current camera session, including available raw pixel formats.
+   * This is useful for determining what raw formats are available for the current camera configuration.
+   *
+   * @throws {@linkcode CameraRuntimeError} When any kind of error occurred while getting session info.
+   * Use the {@linkcode CameraRuntimeError.code | code} property to get the actual error
+   * @example
+   * ```ts
+   * const sessionInfo = await camera.current.getCameraSessionInfo()
+   * console.log('ProRaw supported:', sessionInfo.isProRawSupported)
+   * console.log('Available ProRaw formats:', sessionInfo.availableProRawPixelFormatTypes)
+   * ```
+   */
+  public async getCameraSessionInfo(): Promise<CameraSessionInfo> {
+    try {
+      return await CameraModule.getCameraSessionInfo(this.handle)
     } catch (e) {
       throw tryParseNativeCameraError(e)
     }

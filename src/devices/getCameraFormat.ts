@@ -6,17 +6,23 @@ interface Size {
   height: number
 }
 
+/**
+ * Represents a camera format filter.
+ * * To find the best matching format, leave a filter `undefined`.
+ * * To find a format that has _at least_ this value, set it to the minimum value you want to find
+ * * To find a format that has _exactly_ this value, set it to the exact value you want to find
+ */
 export interface FormatFilter {
   /**
    * The target resolution of the video (and frame processor) output pipeline.
-   * If no format supports the given resolution, the format closest to this value will be used.
+   * If you use `'max'`, the format with the highest video resolution will be selected.
    */
-  videoResolution?: Size | 'max'
+  videoResolution?: 'max' | { width: number; height: number }
   /**
    * The target resolution of the photo output pipeline.
-   * If no format supports the given resolution, the format closest to this value will be used.
+   * If you use `'max'`, the format with the highest photo resolution will be selected.
    */
-  photoResolution?: Size | 'max'
+  photoResolution?: 'max' | { width: number; height: number }
   /**
    * The target aspect ratio of the video (and preview) output, expressed as a factor: `width / height`.
    * (Note: Cameras are in landscape orientation)
@@ -46,22 +52,31 @@ export interface FormatFilter {
   photoAspectRatio?: number
   /**
    * The target FPS you want to record video at.
-   * If the FPS requirements can not be met, the format closest to this value will be used.
+   * If you use `'max'`, the format with the highest FPS will be selected.
    */
-  fps?: number | 'max'
+  fps?: 'max' | number
   /**
    * The target video stabilization mode you want to use.
-   * If no format supports the target video stabilization mode, the best other matching format will be used.
+   * If you use `'auto'`, the best available video stabilization will be used.
    */
   videoStabilizationMode?: VideoStabilizationMode
+  /**
+   * The target pixel format you want to use.
+   * Make sure the given `pixelFormat` is available in the given `CameraDevice`.
+   */
+  pixelFormat?: string
   /**
    * Whether you want to find a format that supports Photo HDR.
    */
   photoHdr?: boolean
   /**
-   * Whether you want to find a format that supports Photo HDR.
+   * Whether you want to find a format that supports Video HDR.
    */
   videoHdr?: boolean
+  /**
+   * Whether you want to find a format that supports depth data delivery for photo or video capture.
+   */
+  supportsDepthCapture?: boolean
   /**
    * The target ISO value for capturing photos.
    * Higher ISO values tend to capture sharper photos, at the cost of reduced capture speed.
@@ -69,9 +84,7 @@ export interface FormatFilter {
    */
   iso?: number | 'max' | 'min'
   /**
-   * The target auto-focus system.
-   * While `phase-detection` is generally the best system available,
-   * you might want to choose a different auto-focus system.
+   * The target auto focus system.
    */
   autoFocusSystem?: AutoFocusSystem
 }
@@ -228,6 +241,12 @@ export function getCameraFormat(device: CameraDevice, filters: FormatFilter[]): 
     if (filter.videoHdr != null) {
       if (bestFormat.supportsVideoHdr === filter.videoHdr.target) leftPoints += filter.videoHdr.priority
       if (format.supportsVideoHdr === filter.videoHdr.target) rightPoints += filter.videoHdr.priority
+    }
+
+    // Find depth capture support
+    if (filter.supportsDepthCapture != null) {
+      if (bestFormat.supportsDepthCapture === filter.supportsDepthCapture.target) leftPoints += filter.supportsDepthCapture.priority
+      if (format.supportsDepthCapture === filter.supportsDepthCapture.target) rightPoints += filter.supportsDepthCapture.priority
     }
 
     // Find matching AF system

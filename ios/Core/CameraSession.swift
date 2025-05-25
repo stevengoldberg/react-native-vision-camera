@@ -46,6 +46,53 @@ final class CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
   }
 
   /**
+   * Whether the current camera session supports Apple ProRaw capture
+   */
+  var isProRawSupported: Bool {
+    guard #available(iOS 14.3, *) else { return false }
+    return photoOutput?.isAppleProRAWSupported ?? false
+  }
+
+  /**
+   * Whether Apple ProRaw is currently enabled on the photo output
+   */
+  var isProRawEnabled: Bool {
+    guard #available(iOS 14.3, *) else { return false }
+    return photoOutput?.isAppleProRAWEnabled ?? false
+  }
+
+  /**
+   * Available raw photo pixel format types.
+   * This array is populated when ProRaw is enabled.
+   *
+   * Note: This includes both traditional RAW formats (Bayer) and Apple ProRaw formats.
+   */
+  var availableRawPhotoPixelFormatTypes: [OSType] {
+    return photoOutput?.availableRawPhotoPixelFormatTypes ?? []
+  }
+
+  /**
+   * Available Apple ProRaw pixel format types (subset of availableRawPhotoPixelFormatTypes).
+   * These are the formats you can use with enableProRaw: true in takePhoto options.
+   */
+  var availableProRawPixelFormatTypes: [OSType] {
+    return availableRawPhotoPixelFormatTypes.filter { format in
+      return AVCapturePhotoOutput.isAppleProRAWPixelFormat(format)
+    }
+  }
+
+  /**
+   * Available traditional (Bayer) RAW pixel format types (subset of availableRawPhotoPixelFormatTypes).
+   * These are traditional RAW formats, not Apple ProRaw.
+   */
+  var availableBayerRAWPixelFormatTypes: [OSType] {
+    guard let photoOutput = photoOutput else { return [] }
+    return photoOutput.availableRawPhotoPixelFormatTypes.filter { format in
+      return AVCapturePhotoOutput.isBayerRAWPixelFormat(format)
+    }
+  }
+
+  /**
    Create a new instance of the `CameraSession`.
    The `onError` callback is used for any runtime errors.
    */
@@ -174,6 +221,8 @@ final class CameraSession: NSObject, AVCaptureVideoDataOutputSampleBufferDelegat
           if difference.outputsChanged || difference.formatChanged {
             self.configureVideoOutputFormat(configuration: config)
             self.configurePhotoOutputFormat(configuration: config)
+            // Configure ProRAW support AFTER format is set
+            self.configureProRawSupport(configuration: config)
           }
           // 7. Configure side-props (fps, lowLightBoost)
           if difference.sidePropsChanged {
