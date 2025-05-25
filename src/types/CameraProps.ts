@@ -404,6 +404,13 @@ export interface CameraProps extends ViewProps {
    */
   onUIRotationChanged?: (uiRotation: number) => void
   /**
+   * Called when the real ProRAW capability has been determined after camera session configuration.
+   * This provides the accurate device ProRAW support status, which can be used to update UI elements.
+   * 
+   * @param isSupported Whether the device actually supports ProRAW capture in the current configuration
+   */
+  onProRawCapabilityChanged?: (isSupported: boolean) => void
+  /**
    * A worklet which will be called for every frame the Camera "sees".
    *
    * @see See [the Frame Processors documentation](https://react-native-vision-camera.com/docs/guides/frame-processors) for more information

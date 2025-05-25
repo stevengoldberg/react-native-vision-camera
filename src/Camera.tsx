@@ -22,6 +22,7 @@ import type {
   OnErrorEvent,
   OutputOrientationChangedEvent,
   PreviewOrientationChangedEvent,
+  ProRawCapabilityChangedEvent,
 } from './NativeCameraView'
 import { NativeCameraView } from './NativeCameraView'
 import { RotationHelper } from './RotationHelper'
@@ -102,6 +103,7 @@ export class Camera extends React.PureComponent<CameraProps, CameraState> {
     this.onPreviewOrientationChanged = this.onPreviewOrientationChanged.bind(this)
     this.onError = this.onError.bind(this)
     this.onCodeScanned = this.onCodeScanned.bind(this)
+    this.onProRawCapabilityChanged = this.onProRawCapabilityChanged.bind(this)
     this.ref = React.createRef<RefType>()
     this.lastFrameProcessor = undefined
     this.state = {
@@ -620,6 +622,10 @@ export class Camera extends React.PureComponent<CameraProps, CameraState> {
     })
   }
 
+  private onProRawCapabilityChanged({ nativeEvent: { isSupported } }: NativeSyntheticEvent<ProRawCapabilityChangedEvent>): void {
+    this.props.onProRawCapabilityChanged?.(isSupported)
+  }
+
   /** @internal */
   componentDidUpdate(): void {
     if (!this.isNativeViewMounted) return
@@ -689,6 +695,7 @@ export class Camera extends React.PureComponent<CameraProps, CameraState> {
         videoBitRateOverride={bitRateOverride}
         onOutputOrientationChanged={this.onOutputOrientationChanged}
         onPreviewOrientationChanged={this.onPreviewOrientationChanged}
+        onProRawCapabilityChanged={this.onProRawCapabilityChanged}
         onError={this.onError}
         codeScannerOptions={codeScanner}
         enableFrameProcessor={frameProcessor != null}

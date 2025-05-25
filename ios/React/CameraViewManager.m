@@ -73,6 +73,8 @@ RCT_REMAP_VIEW_PROPERTY(onAverageFpsChanged, onAverageFpsChangedEvent, RCTDirect
 // Code Scanner
 RCT_EXPORT_VIEW_PROPERTY(codeScannerOptions, NSDictionary);
 RCT_REMAP_VIEW_PROPERTY(onCodeScanned, onCodeScannedEvent, RCTDirectEventBlock);
+// ProRAW Capability
+RCT_REMAP_VIEW_PROPERTY(onProRawCapabilityChanged, onProRawCapabilityChangedEvent, RCTDirectEventBlock);
 
 // Camera View Functions
 RCT_EXTERN_METHOD(startRecording : (nonnull NSNumber*)node options : (NSDictionary*)options onRecordCallback : (RCTResponseSenderBlock)

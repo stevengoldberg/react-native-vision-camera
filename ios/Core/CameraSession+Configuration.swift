@@ -317,8 +317,12 @@ extension CameraSession {
     if #available(iOS 14.3, *) {
       VisionLogger.log(level: .info, message: "Configuring photo output ProRAW support...")
       VisionLogger.log(level: .info, message: "photo.enableProRaw: \(photo.enableProRaw)")
-      VisionLogger.log(level: .info, message: "output.isAppleProRAWSupported: \(photoOutput.isAppleProRAWSupported)")
+      VisionLogger.log(level: .info, message: "Device ProRAW capability: \(photoOutput.isAppleProRAWSupported)")
       VisionLogger.log(level: .info, message: "Current active format: \(videoDeviceInput.device.activeFormat.photoDimensions.width)x\(videoDeviceInput.device.activeFormat.photoDimensions.height)")
+      
+      // Notify delegate that we now have the real ProRAW capability
+      // This is the accurate check following Apple's documentation
+      delegate?.onProRawCapabilityDetermined(isSupported: photoOutput.isAppleProRAWSupported)
       
       if photo.enableProRaw {
         if photoOutput.isAppleProRAWSupported {
@@ -335,6 +339,7 @@ extension CameraSession {
       }
     } else {
       VisionLogger.log(level: .info, message: "iOS < 14.3, ProRAW not available")
+      delegate?.onProRawCapabilityDetermined(isSupported: false)
     }
   }
 }

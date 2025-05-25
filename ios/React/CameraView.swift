@@ -83,6 +83,7 @@ public final class CameraView: UIView, CameraSessionDelegate, PreviewViewDelegat
   @objc var onViewReadyEvent: RCTDirectEventBlock?
   @objc var onAverageFpsChangedEvent: RCTDirectEventBlock?
   @objc var onCodeScannedEvent: RCTDirectEventBlock?
+  @objc var onProRawCapabilityChangedEvent: RCTDirectEventBlock?
 
   // zoom
   @objc var enableZoomGesture = false {
@@ -394,6 +395,13 @@ public final class CameraView: UIView, CameraSessionDelegate, PreviewViewDelegat
   func onAverageFpsChanged(averageFps: Double) {
     onAverageFpsChangedEvent?([
       "averageFps": averageFps,
+    ])
+  }
+
+  func onProRawCapabilityDetermined(isSupported: Bool) {
+    VisionLogger.log(level: .info, message: "Real ProRAW capability determined: \(isSupported)")
+    onProRawCapabilityChangedEvent?([
+      "isSupported": isSupported,
     ])
   }
 }

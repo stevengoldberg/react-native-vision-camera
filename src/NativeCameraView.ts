@@ -23,6 +23,9 @@ export interface OutputOrientationChangedEvent {
 export interface PreviewOrientationChangedEvent {
   previewOrientation: Orientation
 }
+export interface ProRawCapabilityChangedEvent {
+  isSupported: boolean
+}
 export type NativeCameraViewProps = Omit<
   CameraProps,
   | 'device'
@@ -31,6 +34,7 @@ export type NativeCameraViewProps = Omit<
   | 'onShutter'
   | 'onOutputOrientationChanged'
   | 'onPreviewOrientationChanged'
+  | 'onProRawCapabilityChanged'
   | 'frameProcessor'
   | 'codeScanner'
   | 'fps'
@@ -58,6 +62,7 @@ export type NativeCameraViewProps = Omit<
   onShutter?: (event: NativeSyntheticEvent<OnShutterEvent>) => void
   onOutputOrientationChanged?: (event: NativeSyntheticEvent<OutputOrientationChangedEvent>) => void
   onPreviewOrientationChanged?: (event: NativeSyntheticEvent<PreviewOrientationChangedEvent>) => void
+  onProRawCapabilityChanged?: (event: NativeSyntheticEvent<ProRawCapabilityChangedEvent>) => void
 }
 
 // requireNativeComponent automatically resolves 'CameraView' to 'CameraViewManager'

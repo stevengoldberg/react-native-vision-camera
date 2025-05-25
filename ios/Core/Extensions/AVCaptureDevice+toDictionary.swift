@@ -12,11 +12,10 @@ extension AVCaptureDevice {
   func toDictionary() -> [String: Any] {
     VisionLogger.log(level: .info, message: "Checking ProRAW capability for device: \(self.localizedName) (\(self.position.descriptor))")
     
-    // Determine device-level ProRAW support
-    var deviceSupportsProRaw = false
-    if #available(iOS 14.3, *) {
-      deviceSupportsProRaw = AVCapturePhotoOutput().isAppleProRAWSupported
-    }
+    // Device-level ProRAW support will be determined when the camera session is actually configured
+    // to avoid expensive session creation during device enumeration. 
+    // Use getCameraSessionInfo() after camera initialization to get the real capability.
+    let deviceSupportsProRaw = false
     
     // Return ALL formats without ProRAW marking - ProRAW support is now device-level only
     let deviceFormats = self.formats.map { deviceFormat in
