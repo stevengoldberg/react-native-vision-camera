@@ -7,7 +7,6 @@
 //
 
 import AVFoundation
-import CoreImage
 import ImageIO
 import Foundation
 
@@ -236,40 +235,9 @@ class PhotoCaptureDelegate: GlobalReferenceHolder, AVCapturePhotoCaptureDelegate
   }
   
   private func extractHDRGainMap(from photo: AVCapturePhoto, basePath: URL) {
-    guard let photoData = photo.fileDataRepresentation() else { 
-      VisionLogger.log(level: .warning, message: "Failed to get photo data representation")
-      return 
-    }
-    
-    // Use autoreleasepool to ensure proper cleanup of Core Image resources
-    autoreleasepool {
-      // Create CIImage with HDR gain map data
-      guard let ciImage = CIImage(data: photoData, options: [.auxiliaryHDRGainMap: true]) else {
-        VisionLogger.log(level: .warning, message: "Failed to create CIImage with HDR gain map")
-        return
-      }
-      
-      // Create a local CIContext for this operation
-      let context = CIContext()
-      
-      // Extract gain map data with proper error handling
-      guard let gainMapData = context.jpegRepresentation(
-        of: ciImage, 
-        colorSpace: CGColorSpaceCreateDeviceGray(), 
-        options: [:]
-      ) else {
-        VisionLogger.log(level: .warning, message: "Failed to create JPEG representation of HDR gain map")
-        return
-      }
-      
-      // Save gain map file
-      do {
-        let gainMapPath = basePath.appendingPathExtension("gainmap.jpg")
-        try gainMapData.write(to: gainMapPath)
-      } catch {
-        VisionLogger.log(level: .error, message: "Failed to save HDR gain map: \(error)")
-      }
-    }
+    // HDR gain map extraction is currently disabled to prevent resource leaks
+    // This method is kept for future implementation
+    VisionLogger.log(level: .info, message: "HDR gain map extraction is disabled")
   }
   
   private func cleanup() {
