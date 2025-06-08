@@ -188,6 +188,34 @@ export interface CameraDevice {
    */
   neutralZoom: number
   /**
+   * An array of zoom factors at which the virtual device switches between physical cameras.
+   * 
+   * For multi-camera devices, this indicates the zoom levels where the system switches from one 
+   * physical camera to another (e.g., from ultra-wide to wide, or wide to telephoto).
+   * 
+   * @platform iOS
+   * @example
+   * // For a device with ultra-wide, wide, and telephoto cameras:
+   * // virtualDeviceSwitchOverVideoZoomFactors might be [0.5, 2.0]
+   * // Meaning: switches to wide at 0.5x, switches to telephoto at 2.0x
+   */
+  virtualDeviceSwitchOverVideoZoomFactors: number[]
+  /**
+   * The multiplier to convert internal zoom factors to user-friendly magnification values.
+   * 
+   * Use this to display zoom levels as magnification (e.g., "1x", "2x", "0.5x") by multiplying 
+   * the current zoom factor with this multiplier.
+   * 
+   * @platform iOS
+   * @example
+   * const currentMagnification = currentZoom * device.displayVideoZoomFactorMultiplier
+   * console.log(`Current zoom: ${currentMagnification.toFixed(1)}x`)
+   * 
+   * @note On iOS 18+, this uses the official `displayVideoZoomFactorMultiplier` API.
+   * On older iOS versions, this is calculated as `1.0 / neutralZoom` for equivalent functionality.
+   */
+  displayVideoZoomFactorMultiplier: number
+  /**
    * The minimum Exposure-Bias value this format supports. When setting the `exposure` to this value, the image is almost completely dark (under-exposed).
    */
   minExposure: number

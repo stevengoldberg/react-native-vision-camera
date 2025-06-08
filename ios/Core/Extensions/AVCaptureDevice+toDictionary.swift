@@ -29,6 +29,8 @@ extension AVCaptureDevice {
       "minZoom": minAvailableVideoZoomFactor,
       "maxZoom": maxAvailableVideoZoomFactor,
       "neutralZoom": neutralZoomFactor,
+      "virtualDeviceSwitchOverVideoZoomFactors": virtualDeviceSwitchOverVideoZoomFactors.map { $0.doubleValue },
+      "displayVideoZoomFactorMultiplier": getDisplayVideoZoomFactorMultiplier(),
       "minExposure": minExposureTargetBias,
       "maxExposure": maxExposureTargetBias,
       "isMultiCam": isMultiCam,
@@ -38,5 +40,16 @@ extension AVCaptureDevice {
       "sensorOrientation": sensorOrientation.jsValue,
       "formats": deviceFormats.map { $0.toJSValue() },
     ]
+  }
+  
+  private func getDisplayVideoZoomFactorMultiplier() -> Double {
+    if #available(iOS 18.0, *) {
+      // Use the official API on iOS 18+
+      return displayVideoZoomFactorMultiplier
+    } else {
+      // For older iOS versions, calculate equivalent using neutralZoomFactor
+      // magnification = zoomFactor / neutralZoom, so multiplier = 1.0 / neutralZoom
+      return 1.0 / neutralZoomFactor
+    }
   }
 }
