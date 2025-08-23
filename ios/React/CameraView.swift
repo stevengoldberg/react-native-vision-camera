@@ -7,6 +7,7 @@
 //
 
 import AVFoundation
+import AVKit
 import Foundation
 import UIKit
 
@@ -83,6 +84,7 @@ public final class CameraView: UIView, CameraSessionDelegate, PreviewViewDelegat
   @objc var onAverageFpsChangedEvent: RCTDirectEventBlock?
   @objc var onCodeScannedEvent: RCTDirectEventBlock?
   @objc var onProRawCapabilityChangedEvent: RCTDirectEventBlock?
+  @objc var onVolumeButtonPressedEvent: RCTDirectEventBlock?
 
   // zoom
   @objc var enableZoomGesture = false {
@@ -105,6 +107,7 @@ public final class CameraView: UIView, CameraSessionDelegate, PreviewViewDelegat
   var isMounted = false
   private var currentConfigureCall: DispatchTime?
   private let fpsSampleCollector = FpsSampleCollector()
+  @available(iOS 17.2, *) private var captureEventInteraction: AVCaptureEventInteraction?
 
   // CameraView+Zoom
   var pinchGestureRecognizer: UIPinchGestureRecognizer?
@@ -138,6 +141,11 @@ public final class CameraView: UIView, CameraSessionDelegate, PreviewViewDelegat
       }
     } else {
       fpsSampleCollector.stop()
+      // Remove event interaction when view is removed
+      if #available(iOS 17.2, *), let interaction = captureEventInteraction {
+        removeInteraction(interaction)
+        captureEventInteraction = nil
+      }
     }
   }
 
@@ -285,6 +293,11 @@ public final class CameraView: UIView, CameraSessionDelegate, PreviewViewDelegat
 
     // Prevent phone from going to sleep
     UIApplication.shared.isIdleTimerDisabled = isActive
+
+    // Update event interaction if active-state changed
+    if changedProps.contains("isActive") {
+      updateCaptureEventInteraction()
+    }
   }
 
   func updatePreview() {
@@ -402,5 +415,37 @@ public final class CameraView: UIView, CameraSessionDelegate, PreviewViewDelegat
     onProRawCapabilityChangedEvent?([
       "isSupported": isSupported,
     ])
+  }
+
+  // MARK: - AVCaptureEventInteraction (iOS 17.2+)
+  private func updateCaptureEventInteraction() {
+    if #available(iOS 17.2, *) {
+      if isActive {
+        if captureEventInteraction == nil {
+          let interaction = AVCaptureEventInteraction(primaryHandler: { [weak self] event in
+            guard let self = self else { return }
+            if event.phase == .began {
+              self.onVolumeButtonPressedEvent?([:])
+            }
+          }, secondaryHandler: { [weak self] event in
+            guard let self = self else { return }
+            if event.phase == .began {
+              self.onVolumeButtonPressedEvent?([:])
+            }
+          })
+          interaction.isEnabled = true
+          addInteraction(interaction)
+          captureEventInteraction = interaction
+        } else {
+          captureEventInteraction?.isEnabled = true
+        }
+      } else {
+        if let interaction = captureEventInteraction {
+          interaction.isEnabled = false
+          removeInteraction(interaction)
+          captureEventInteraction = nil
+        }
+      }
+    }
   }
 }

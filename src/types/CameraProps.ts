@@ -394,6 +394,12 @@ export interface CameraProps extends ViewProps {
    */
   onUIRotationChanged?: (uiRotation: number) => void
   /**
+   * Called when a hardware volume button is pressed while the Camera is active.
+   *
+   * @platform iOS 17.2+
+   */
+  onVolumeButtonPressed?: () => void
+  /**
    * Called when the real ProRAW capability has been determined after camera session configuration.
    * This provides the accurate device ProRAW support status, which can be used to update UI elements.
    * 

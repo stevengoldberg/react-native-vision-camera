@@ -34,6 +34,7 @@ export type NativeCameraViewProps = Omit<
   | 'onShutter'
   | 'onOutputOrientationChanged'
   | 'onPreviewOrientationChanged'
+  | 'onVolumeButtonPressed'
   | 'onProRawCapabilityChanged'
   | 'frameProcessor'
   | 'codeScanner'
@@ -62,6 +63,7 @@ export type NativeCameraViewProps = Omit<
   onShutter?: (event: NativeSyntheticEvent<OnShutterEvent>) => void
   onOutputOrientationChanged?: (event: NativeSyntheticEvent<OutputOrientationChangedEvent>) => void
   onPreviewOrientationChanged?: (event: NativeSyntheticEvent<PreviewOrientationChangedEvent>) => void
+  onVolumeButtonPressed?: (event: NativeSyntheticEvent<void>) => void
   onProRawCapabilityChanged?: (event: NativeSyntheticEvent<ProRawCapabilityChangedEvent>) => void
 }
 

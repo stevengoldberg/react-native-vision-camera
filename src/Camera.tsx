@@ -104,6 +104,7 @@ export class Camera extends React.PureComponent<CameraProps, CameraState> {
     this.onError = this.onError.bind(this)
     this.onCodeScanned = this.onCodeScanned.bind(this)
     this.onProRawCapabilityChanged = this.onProRawCapabilityChanged.bind(this)
+    this.onVolumeButtonPressed = this.onVolumeButtonPressed.bind(this)
     this.ref = React.createRef<RefType>()
     this.lastFrameProcessor = undefined
     this.state = {
@@ -556,6 +557,10 @@ export class Camera extends React.PureComponent<CameraProps, CameraState> {
     this.props.onShutter?.(event.nativeEvent)
   }
 
+  private onVolumeButtonPressed(): void {
+    this.props.onVolumeButtonPressed?.()
+  }
+
   private onOutputOrientationChanged({ nativeEvent: { outputOrientation } }: NativeSyntheticEvent<OutputOrientationChangedEvent>): void {
     this.rotationHelper.outputOrientation = outputOrientation
     this.props.onOutputOrientationChanged?.(outputOrientation)
@@ -691,6 +696,7 @@ export class Camera extends React.PureComponent<CameraProps, CameraState> {
         onPreviewStarted={this.onPreviewStarted}
         onPreviewStopped={this.onPreviewStopped}
         onShutter={this.onShutter}
+        onVolumeButtonPressed={this.onVolumeButtonPressed}
         videoBitRateMultiplier={bitRateMultiplier}
         videoBitRateOverride={bitRateOverride}
         onOutputOrientationChanged={this.onOutputOrientationChanged}
