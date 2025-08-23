@@ -107,7 +107,7 @@ public final class CameraView: UIView, CameraSessionDelegate, PreviewViewDelegat
   var isMounted = false
   private var currentConfigureCall: DispatchTime?
   private let fpsSampleCollector = FpsSampleCollector()
-  @available(iOS 17.2, *) private var captureEventInteraction: AVCaptureEventInteraction?
+  private var captureEventInteraction: UIInteraction?
 
   // CameraView+Zoom
   var pinchGestureRecognizer: UIPinchGestureRecognizer?
@@ -142,7 +142,7 @@ public final class CameraView: UIView, CameraSessionDelegate, PreviewViewDelegat
     } else {
       fpsSampleCollector.stop()
       // Remove event interaction when view is removed
-      if #available(iOS 17.2, *), let interaction = captureEventInteraction {
+      if let interaction = captureEventInteraction {
         removeInteraction(interaction)
         captureEventInteraction = nil
       }
@@ -422,26 +422,22 @@ public final class CameraView: UIView, CameraSessionDelegate, PreviewViewDelegat
     if #available(iOS 17.2, *) {
       if isActive {
         if captureEventInteraction == nil {
-          let interaction = AVCaptureEventInteraction(primaryHandler: { [weak self] event in
+          let interaction = AVCaptureEventInteraction(primary: { [weak self] event in
             guard let self = self else { return }
             if event.phase == .began {
               self.onVolumeButtonPressedEvent?([:])
             }
-          }, secondaryHandler: { [weak self] event in
+          }, secondary: { [weak self] event in
             guard let self = self else { return }
             if event.phase == .began {
               self.onVolumeButtonPressedEvent?([:])
             }
           })
-          interaction.isEnabled = true
           addInteraction(interaction)
           captureEventInteraction = interaction
-        } else {
-          captureEventInteraction?.isEnabled = true
         }
       } else {
         if let interaction = captureEventInteraction {
-          interaction.isEnabled = false
           removeInteraction(interaction)
           captureEventInteraction = nil
         }
