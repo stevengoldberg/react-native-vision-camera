@@ -83,7 +83,7 @@ class PhotoCaptureDelegate: GlobalReferenceHolder, AVCapturePhotoCaptureDelegate
     let photoOrientation = photo.metadata[String(kCGImagePropertyOrientation)] as? UInt32 ?? CGImagePropertyOrientation.up.rawValue
     
     if isRawPhoto {
-      photoData = photo.fileDataRepresentation()
+      photoData = photo.fileDataRepresentation(with: metadataProvider)
     } else {
       photoData = nil
     }
