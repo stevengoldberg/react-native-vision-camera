@@ -25,6 +25,20 @@ export type CameraPosition = 'front' | 'back' | 'external'
 export type PhysicalCameraDeviceType = 'ultra-wide-angle-camera' | 'wide-angle-camera' | 'telephoto-camera'
 
 /**
+ * Details about a physical camera's optical characteristics
+ */
+export interface PhysicalCameraDetails {
+  /**
+   * The type of physical camera
+   */
+  type: PhysicalCameraDeviceType
+  /**
+   * The horizontal field of view in degrees for this physical camera
+   */
+  fieldOfView: number
+}
+
+/**
  * Indicates a format's autofocus system.
  *
  * * `"none"`: Indicates that autofocus is not available
@@ -129,6 +143,23 @@ export interface CameraDevice {
    * You can check if the camera is a logical multi-camera by using the `isMultiCam` property.
    */
   physicalDevices: PhysicalCameraDeviceType[]
+  /**
+   * Detailed information about each physical camera, including its field of view.
+   * This allows you to calculate the 35mm equivalent focal length for each physical camera.
+   * 
+   * For multi-camera virtual devices, this exposes the individual FOV of each constituent camera.
+   *
+   * @platform iOS
+   * @example
+   * // Find the wide-angle camera's FOV
+   * const wideCamera = device.physicalCameraDetails?.find(c => c.type === 'wide-angle-camera')
+   * if (wideCamera) {
+   *   // Calculate 35mm equivalent focal length (videoFieldOfView is horizontal FOV)
+   *   const focalLength = 36 / (2 * Math.tan((wideCamera.fieldOfView * Math.PI / 180) / 2))
+   *   console.log(`Wide-angle focal length: ${focalLength.toFixed(0)}mm`)
+   * }
+   */
+  physicalCameraDetails?: PhysicalCameraDetails[]
   /**
    * Specifies the physical position of this camera.
    * - `back`: The Camera Device is located on the back of the phone. These devices can be used for capturing what's in front of the user.

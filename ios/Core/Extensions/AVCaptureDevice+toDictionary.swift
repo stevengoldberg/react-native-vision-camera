@@ -21,6 +21,7 @@ extension AVCaptureDevice {
     return [
       "id": uniqueID,
       "physicalDevices": physicalDevices.map(\.deviceType.physicalDeviceDescriptor),
+      "physicalCameraDetails": getPhysicalCameraDetails(),
       "position": position.descriptor,
       "name": localizedName,
       "hasFlash": hasFlash,
@@ -51,5 +52,25 @@ extension AVCaptureDevice {
       // magnification = zoomFactor / neutralZoom, so multiplier = 1.0 / neutralZoom
       return 1.0 / neutralZoomFactor
     }
+  }
+  
+  private func getPhysicalCameraDetails() -> [[String: Any]] {
+    var details: [[String: Any]] = []
+    
+    // Get all physical cameras (for virtual devices, this returns constituent devices)
+    let cameras = physicalDevices
+    
+    for camera in cameras {
+      // Get FOV from first format (all formats from same physical camera have same FOV)
+      guard let format = camera.formats.first else { continue }
+      let fov = format.videoFieldOfView
+      
+      details.append([
+        "type": camera.deviceType.physicalDeviceDescriptor,
+        "fieldOfView": Double(fov)
+      ])
+    }
+    
+    return details
   }
 }
